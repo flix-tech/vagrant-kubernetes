@@ -1,0 +1,9 @@
+etcd-v*.tar.gz
+kubernetes-v*.tar.gz
+.vagrant/
+.idea/
+tmp/
+package.box
+stripped.box
+cloned.vdi
+box.meta

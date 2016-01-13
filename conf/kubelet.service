@@ -1,0 +1,22 @@
+[Unit]
+Description=Kubernetes Kubelet
+Documentation=https://github.com/kubernetes/kubernetes
+Wants=docker.service kube-api-server.service
+After=docker.service
+
+[Service]
+ExecStart=/usr/bin/hyperkube kubelet \
+--config=/etc/kubernetes/manifests/ \
+--logtostderr=true \
+--hostname-override=${BRIDGE_IP} \
+--address=0.0.0.0 \
+--api-servers=http://localhost:8080 \
+--configure-cbr0=false \
+--resource-container= \
+--cluster-dns=${CLUSTERDNS_IP} \
+--cluster-domain=${DOMAIN}
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

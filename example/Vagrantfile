@@ -1,0 +1,3 @@
+Vagrant.configure(2) do |config|
+  config.vm.box = "https://vbox.example.com/debian-jessie-kubernetes-amd64.box"
+end

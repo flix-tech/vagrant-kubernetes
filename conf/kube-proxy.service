@@ -1,0 +1,16 @@
+[Unit]
+Description=Kubernetes Kubeproxy
+Documentation=https://github.com/kubernetes/kubernetes
+Wants=kube-api-server.service
+
+[Service]
+ExecStart=/usr/bin/hyperkube proxy \
+--proxy-mode=userspace \
+--resource-container= \
+--master=127.0.0.1:8080 \
+--v=2
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
