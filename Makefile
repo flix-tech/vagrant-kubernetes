@@ -38,7 +38,7 @@ tmp/Vagrantfile: package.box
 	mkdir -p tmp
 	tar xzf package.box -C tmp/
 	sed -i '/vagrant_private_key/d' tmp/Vagrantfile
-	rm tmp/vagrant_private_key
+	rm -f tmp/vagrant_private_key
 
 stripped.box: tmp/Vagrantfile
 	tar -czf stripped.box -C tmp/ .
