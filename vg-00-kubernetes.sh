@@ -88,8 +88,8 @@ systemctl enable kubelet kube-api-server kube-controller-manager kube-scheduler 
 systemctl start kubelet kube-api-server kube-controller-manager kube-scheduler kube-proxy kube-etcd
 
 mkdir -p /etc/kubernetes/manifests
-sed -e "s%\${DOMAIN}%${DOMAIN}%" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%" /vagrant/conf/kube-dns.rc.yml > /etc/kubernetes/manifests/kube-dns.rc.yml
-sed -e "s%\${DOMAIN}%${DOMAIN}%" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%" /vagrant/conf/kube-dns.svc.yml > /etc/kubernetes/manifests/kube-dns.svc.yml
+sed -e "s%\${DOMAIN}%${DOMAIN}%" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%" -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%" /vagrant/conf/kube-dns.rc.yml > /etc/kubernetes/manifests/kube-dns.rc.yml
+sed -e "s%\${DOMAIN}%${DOMAIN}%" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%"  /vagrant/conf/kube-dns.svc.yml > /etc/kubernetes/manifests/kube-dns.svc.yml
 
 # Install sysdig
 echo "export SYSDIG_K8S_API=http://127.0.0.1:8080" >> /etc/profile.d/sysdig.sh

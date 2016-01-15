@@ -1,6 +1,6 @@
 .PHONY: default clean dist-clean add-box del-box
 
-VERSION=0.3.1
+VERSION=0.1.1
 
 default: stripped.box
 
@@ -37,7 +37,8 @@ package.box: .vagrant/repartinioned Vagrantfile.dist
 tmp/Vagrantfile: package.box
 	mkdir -p tmp
 	tar xzf package.box -C tmp/
-	sed -i '/vagrant_private_key/d' tmp/Vagrantfile
+	sed -i.back '/vagrant_private_key/d' tmp/Vagrantfile
+	rm -f tmp/Vagrantfile.back
 	rm -f tmp/vagrant_private_key
 
 stripped.box: tmp/Vagrantfile
