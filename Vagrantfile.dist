@@ -9,6 +9,18 @@ Vagrant.configure(2) do |config|
     # interfaces are reachable
     vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
     # Otherwise we get really slow DNS lookup on OSX (Changed DNS inside the machine)
-    vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    # vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+
+    # Use the paravirt network adapter, because the default one hangs on linux hosts
+    # Vagrant::Util::Platform.platform == "linux-gnu"
+    # Vagrant::Util::Platform.platform.start_with?("darwin")
+
+    if Vagrant::Util::Platform.platform.start_with?("darwin")
+        vb.customize ["modifyvm", :id, "--nictype1", "82543GC"]
+        vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
+    else
+        vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
+        vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
+    end
   end
 end

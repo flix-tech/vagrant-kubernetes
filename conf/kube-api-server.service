@@ -8,9 +8,7 @@ After=kube-etcd.service
 ExecStart=/usr/bin/hyperkube apiserver \
 --service-cluster-ip-range=${PORTAL_CIRD} \
 --insecure-bind-address=0.0.0.0 \
---etcd-servers=http://127.0.0.1:4001 \
---cluster-name=kubernetes \
---v=2
+--etcd-servers=http://127.0.0.1:4001
 Restart=always
 RestartSec=10
 

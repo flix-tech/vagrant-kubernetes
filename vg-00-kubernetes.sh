@@ -16,6 +16,10 @@ PORTAL_CIRD=10.0.0.1/24
 CLUSTERDNS_IP=10.0.0.10
 DOMAIN=example.local
 
+# Overwrite Vboxnameserver because of bad performance on OSX
+echo "supersede domain-name-servers 8.8.8.8, 8.8.4.4;" >> /etc/dhcp/dhclient.conf
+printf "nameserver 8.8.8.8\nnameserver 8.8.4.4\n" > /etc/resolv.conf
+
 # Disable all docker networking stuff, we will set it up manually
 mkdir -p /etc/systemd/system/docker.service.d/
 sed -e "s%\${DOCKER_CIRD}%${DOCKER_CIRD}%" /vagrant/conf/docker-override.conf > /etc/systemd/system/docker.service.d/override.conf
@@ -57,7 +61,7 @@ apt-get -yq install bridge-utils ethtool htop \
 ifup cbr0
 apt-get --quiet --yes --force-yes install \
     bridge-utils ethtool htop build-essential docker-engine=${DOCKER_VERSION}-0~jessie \
-    sysdig linux-headers-$(uname -r) # For sysdig
+    sysdig linux-headers-$(uname -r) bindfs # For sysdig # bindfs is for fixing NFS mount permissions
 
 # Add vagrant user to docker group, so that vagrant can user docker without sudo
 usermod -aG docker vagrant
@@ -88,23 +92,47 @@ systemctl enable kubelet kube-api-server kube-controller-manager kube-scheduler 
 systemctl start kubelet kube-api-server kube-controller-manager kube-scheduler kube-proxy kube-etcd
 
 mkdir -p /etc/kubernetes/manifests
-sed -e "s%\${DOMAIN}%${DOMAIN}%" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%" -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%" /vagrant/conf/kube-dns.rc.yml > /etc/kubernetes/manifests/kube-dns.rc.yml
-sed -e "s%\${DOMAIN}%${DOMAIN}%" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%"  /vagrant/conf/kube-dns.svc.yml > /etc/kubernetes/manifests/kube-dns.svc.yml
+sed -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%" /vagrant/conf/kube-master.yml > /etc/kubernetes/manifests/kube-master.yml
+sed -e "s%\${DOMAIN}%${DOMAIN}%" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%" /vagrant/conf/kube-dns.yml > /etc/kubernetes/manifests/kube-dns.yml
+cp /vagrant/conf/kube-dashboard.yml /etc/kubernetes/manifests/kube-dashboard.yml
 
 # Install sysdig
 echo "export SYSDIG_K8S_API=http://127.0.0.1:8080" >> /etc/profile.d/sysdig.sh
 
-echo Waiting for API server to show up
+echo "Waiting for API server to show up"
 until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do
     printf '.'
     sleep 1
 done
 
-kubectl create -f /etc/kubernetes/manifests/kube-dns.rc.yml
-kubectl create -f /etc/kubernetes/manifests/kube-dns.svc.yml
+kubectl create -f /etc/kubernetes/manifests/kube-master.yml
+kubectl create -f /etc/kubernetes/manifests/kube-dns.yml
+kubectl create -f /etc/kubernetes/manifests/kube-dashboard.yml
 
 # Clear tmp dir, because otherwise vagrant user would not have access
 # See kubectl apply --schema-cache-dir=
 rm -rf /tmp/kubectl.schema/
 
-apt-get clean && rm -rf /var/lib/apt/lists/*
+# Create bindfs related folders for fixing NFS mount permissions
+mkdir /www-data
+mkdir /nfs-data
+# Add fstab line to auto-start bindfs relation when box starts
+echo "bindfs#/nfs-data    /www-data    fuse    force-user=www-data,force-group=www-data    0    0" >> /etc/fstab
+
+cat >> /etc/bash.bashrc << EOF
+# enable bash completion in interactive shells
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+EOF
+
+# Enable memory cgroups
+sed -i -e 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="cgroup_enable=memory /' /etc/default/grub
+update-grub
+
+# cleanup
+apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*

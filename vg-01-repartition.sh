@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
-set -o verbose
 set -o errexit
+
+echo "Waiting for kube-dns to show up"
+until $(kubectl --namespace=kube-system get pods | grep -q '^kube-dns.*4/4.*$'); do
+    printf '.'
+    sleep 5
+done
+set -o verbose
 
 swapoff /dev/sda5
 

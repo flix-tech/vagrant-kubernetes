@@ -5,8 +5,7 @@ Wants=kube-api-server.service
 
 [Service]
 ExecStart=/usr/bin/hyperkube controller-manager \
---master=127.0.0.1:8080 \
---v=2
+--master=127.0.0.1:8080
 Restart=always
 RestartSec=10
 
