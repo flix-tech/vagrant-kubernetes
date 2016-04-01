@@ -62,8 +62,8 @@ Now that we know how we want our machine to look like we can write a provisionin
 We hardcoded our versions to know good ones:
 ```
 ETCD_VERSION=2.2.3
-KUBERNETES_VERSION=1.1.4
-DOCKER_VERSION=1.8.3
+KUBERNETES_VERSION=1.2.0
+DOCKER_VERSION=1.10.3
 ```
 
 And networking:
