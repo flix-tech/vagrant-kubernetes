@@ -11,16 +11,22 @@ Vagrant.configure(2) do |config|
     # Otherwise we get really slow DNS lookup on OSX (Changed DNS inside the machine)
     # vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
 
-    # Use the paravirt network adapter, because the default one hangs on linux hosts
+    # Use the paravirt network adapter, because the default one hangs on linux hosts, also OSX
     # Vagrant::Util::Platform.platform == "linux-gnu"
     # Vagrant::Util::Platform.platform.start_with?("darwin")
 
-    if Vagrant::Util::Platform.platform.start_with?("darwin")
-        vb.customize ["modifyvm", :id, "--nictype1", "82543GC"]
-        vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
-    else
+    if Vagrant::Util::Platform.platform == "linux-gnu"
         vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
         vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
+    else
+        # problems should be fixed with virtual box 5.0.20
     end
+
+    # Doesn't really work needs to be set in original Vagrantfile
+    # config.ssh.forward_agent = true
+
+    # Somehow machine looses the mac address set up by vagrant after us changing the nic type
+    # so set it again manually
+    #vb.customize ["modifyvm", :id, "--macaddress1", "080027165E4C"]
   end
 end

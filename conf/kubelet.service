@@ -14,7 +14,7 @@ ExecStart=/usr/bin/hyperkube kubelet \
 --configure-cbr0=false \
 --resource-container= \
 --cluster-dns=${CLUSTERDNS_IP} \
---cluster-domain=${DOMAIN}
+--cluster-domain=${DNS_DOMAIN}
 Restart=always
 RestartSec=10
 

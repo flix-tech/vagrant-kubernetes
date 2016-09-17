@@ -1,6 +1,6 @@
 Vagrant.configure(2) do |config|
   config.vm.box = "debian/jessie64"
-  config.vm.box_version = "8.2.1"
+  config.vm.box_version = "8.5.2"
   # Disabled VirtualBox Guest updates
   if Vagrant.has_plugin?("vagrant-vbguest")
     config.vbguest.auto_update = false

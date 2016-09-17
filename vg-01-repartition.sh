@@ -2,7 +2,7 @@
 set -o errexit
 
 echo "Waiting for kube-dns to show up"
-until $(kubectl --namespace=kube-system get pods | grep -q '^kube-dns.*4/4.*$'); do
+until $(kubectl --namespace=kube-system get pods | grep -q '^kube-dns.*3/3.*$'); do
     printf '.'
     sleep 5
 done

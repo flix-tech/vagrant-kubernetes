@@ -1,13 +1,13 @@
 .PHONY: default clean dist-clean add-box del-box
 
-VERSION=0.2.0
+VERSION=1.3.7
 
-default: stripped.box
+default: stripped.box box.meta
 
 add-box: stripped.box
 	vagrant box add vagrant-kubernetes stripped.box -f
 
-del-box: stripped.box
+del-box:
 	vagrant box remove kubernetes
 
 .vagrant/machines/default/virtualbox/id: vg-00-kubernetes.sh conf/*
@@ -17,15 +17,15 @@ del-box: stripped.box
 
 .vagrant/repartinioned: .vagrant/machines/default/virtualbox/id vg-*.sh
 	$(eval MACHINEID:=$(shell cat .vagrant/machines/default/virtualbox/id))
-	$(eval HDDFILE:=$(shell VBoxManage showvminfo --machinereadable $(MACHINEID) | grep "IDE Controller-0-0" | cut -d '=' -f 2))
+	$(eval HDDFILE:=$(shell VBoxManage showvminfo --machinereadable $(MACHINEID) | grep "SATA Controller-0-0" | cut -d '=' -f 2))
 	test -f cloned.vdi && vboxmanage closemedium disk cloned.vdi --delete || true
 	VBoxManage clonehd $(HDDFILE) cloned.vdi --format vdi
-	VBoxManage modifyvm $(MACHINEID) --hda none
-	vboxmanage closemedium disk $(HDDFILE) --delete
+	VBoxManage storageattach $(MACHINEID) --storagectl "SATA Controller" --port 0 --medium none
+	VBoxManage closemedium disk $(HDDFILE) --delete
 	VBoxManage modifyhd cloned.vdi --resize 122880 # 120 GB
 	VBoxManage clonehd cloned.vdi $(HDDFILE) --format vmdk
-	VBoxManage modifyvm $(MACHINEID) --hda $(HDDFILE)
-	vboxmanage closemedium disk cloned.vdi --delete
+	VBoxManage storageattach $(MACHINEID) --storagectl "SATA Controller" --port 0 --type hdd --medium $(HDDFILE)
+	VBoxManage closemedium disk cloned.vdi --delete
 	SCRIPT=vg-01-repartition.sh vagrant reload --provision
 	SCRIPT=vg-02-reformat.sh vagrant reload --provision
 	touch .vagrant/repartinioned
