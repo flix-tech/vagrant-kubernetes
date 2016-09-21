@@ -1,5 +1,11 @@
 # How to setup a lightweight Kubernetes Vagrant Machine
 
+## Quickstart
+
+```
+vagrant init flixtech/kubernetes; vagrant up --provider virtualbox
+```
+
 ## TL;DR
 
 ```
