@@ -24,15 +24,15 @@ printf "nameserver 8.8.8.8\nnameserver 8.8.4.4\n" > /etc/resolv.conf
 
 # Disable all docker networking stuff, we will set it up manually
 mkdir -p /etc/systemd/system/docker.service.d/
-sed -e "s%\${DOCKER_CIRD}%${DOCKER_CIRD}%" /vagrant/conf/docker-override.conf > /etc/systemd/system/docker.service.d/override.conf
+sed -e "s%\${DOCKER_CIRD}%${DOCKER_CIRD}%g" /vagrant/conf/docker-override.conf > /etc/systemd/system/docker.service.d/override.conf
 
 # Setup the bridge for docker, we connect it with the VirtualBox network (eth1)
-sed -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%" -e "s%\${BRIDGE_MASK}%${BRIDGE_MASK}%" /vagrant/conf/cbr0 > /etc/network/interfaces.d/cbr0
+sed -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%g" -e "s%\${BRIDGE_MASK}%${BRIDGE_MASK}%g" /vagrant/conf/cbr0 > /etc/network/interfaces.d/cbr0
 echo hwaddress ether ${MACADDRESS} >> /etc/network/interfaces
 
 cp /vagrant/conf/vagrant-startup.service /etc/systemd/system/vagrant-startup.service
 
-sed -e "s%\${NET_CIRD}%${NET_CIRD}%" -e "s%\${PORTAL_CIRD}%${PORTAL_CIRD}%" /vagrant/conf/vagrant-startup.sh > /usr/bin/vagrant-startup
+sed -e "s%\${NET_CIRD}%${NET_CIRD}%g" -e "s%\${PORTAL_CIRD}%${PORTAL_CIRD}%g" /vagrant/conf/vagrant-startup.sh > /usr/bin/vagrant-startup
 chmod +x /usr/bin/vagrant-startup
 systemctl enable vagrant-startup
 systemctl start vagrant-startup
@@ -88,8 +88,8 @@ tar -xf kubernetes/server/kubernetes-server-linux-amd64.tar.gz --strip-component
 rm -rf kubernetes
 mv hyperkube kubectl /usr/bin
 
-sed -e "s%\${PORTAL_CIRD}%${PORTAL_CIRD}%" /vagrant/conf/kube-apiserver.service > /etc/systemd/system/kube-apiserver.service
-sed -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%" -e "s%\${DNS_DOMAIN}%${DNS_DOMAIN}%" /vagrant/conf/kubelet.service > /etc/systemd/system/kubelet.service
+sed -e "s%\${PORTAL_CIRD}%${PORTAL_CIRD}%g" /vagrant/conf/kube-apiserver.service > /etc/systemd/system/kube-apiserver.service
+sed -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%g" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%g" -e "s%\${DNS_DOMAIN}%${DNS_DOMAIN}%g" /vagrant/conf/kubelet.service > /etc/systemd/system/kubelet.service
 cp /vagrant/conf/kube-controller-manager.service \
    /vagrant/conf/kube-scheduler.service \
    /vagrant/conf/kube-proxy.service \
@@ -99,8 +99,8 @@ systemctl enable kubelet kube-apiserver kube-controller-manager kube-scheduler k
 systemctl start kubelet kube-apiserver kube-controller-manager kube-scheduler kube-proxy kube-etcd
 
 mkdir -p /etc/kubernetes/manifests
-sed -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%" /vagrant/conf/kube-master.yml > /etc/kubernetes/manifests/kube-master.yml
-sed -e "s%\${DNS_DOMAIN}%${DNS_DOMAIN}%" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%" /vagrant/conf/kube-dns.yml > /etc/kubernetes/manifests/kube-dns.yml
+sed -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%g" /vagrant/conf/kube-master.yml > /etc/kubernetes/manifests/kube-master.yml
+sed -e "s%\${DNS_DOMAIN}%${DNS_DOMAIN}%g" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%g" /vagrant/conf/kube-dns.yml > /etc/kubernetes/manifests/kube-dns.yml
 cp /vagrant/conf/kube-dashboard.yml /etc/kubernetes/manifests/kube-dashboard.yml
 
 # Install sysdig
