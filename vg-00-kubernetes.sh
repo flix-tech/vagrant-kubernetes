@@ -87,6 +87,7 @@ tar -xf /vagrant/kubernetes-v${KUBERNETES_VERSION}.tar.gz
 tar -xf kubernetes/server/kubernetes-server-linux-amd64.tar.gz --strip-components=3 kubernetes/server/bin/kubectl kubernetes/server/bin/hyperkube
 rm -rf kubernetes
 mv hyperkube kubectl /usr/bin
+chmod +x /usr/bin/kubectl
 
 sed -e "s%\${PORTAL_CIRD}%${PORTAL_CIRD}%g" /vagrant/conf/kube-apiserver.service > /etc/systemd/system/kube-apiserver.service
 sed -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%g" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%g" -e "s%\${DNS_DOMAIN}%${DNS_DOMAIN}%g" /vagrant/conf/kubelet.service > /etc/systemd/system/kubelet.service
