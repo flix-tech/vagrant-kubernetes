@@ -1,6 +1,6 @@
 .PHONY: default clean dist-clean add-box del-box
 
-VERSION=1.4.0-r0
+VERSION=1.4.0-r1
 
 default: stripped.box box.meta
 
