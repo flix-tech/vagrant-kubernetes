@@ -4,10 +4,12 @@ Documentation=https://github.com/kubernetes/kubernetes
 Wants=kube-api-server.service
 
 [Service]
-ExecStart=/usr/bin/hyperkube controller-manager \
---master=127.0.0.1:8080
 Restart=always
 RestartSec=10
+ExecStart=/usr/bin/hyperkube controller-manager \
+--master=127.0.0.1:8080 \
+--service-account-private-key-file=/var/run/kubernetes/apiserver.key \
+--root-ca-file=/var/run/kubernetes/apiserver.crt \
 
 [Install]
 WantedBy=multi-user.target

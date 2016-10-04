@@ -5,12 +5,13 @@ Wants=kube-etcd.service
 After=kube-etcd.service
 
 [Service]
+Restart=always
+RestartSec=10
 ExecStart=/usr/bin/hyperkube apiserver \
 --service-cluster-ip-range=${PORTAL_CIRD} \
 --insecure-bind-address=0.0.0.0 \
---etcd-servers=http://127.0.0.1:4001
-Restart=always
-RestartSec=10
+--etcd-servers=http://127.0.0.1:4001 \
+--admission-control=AlwaysAdmit,ServiceAccount \
 
 [Install]
 WantedBy=multi-user.target

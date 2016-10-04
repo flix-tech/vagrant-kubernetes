@@ -52,7 +52,6 @@ spec:
         args:
         # command = "/kube-dns"
         - --domain=${DNS_DOMAIN}.
-        - --kube_master_url=http://10.0.0.2
         - --dns-port=10053
         ports:
         - containerPort: 10053

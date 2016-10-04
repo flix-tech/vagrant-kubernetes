@@ -68,7 +68,7 @@ Now that we know how we want our machine to look like we can write a provisionin
 We hardcoded our versions to know good ones:
 ```
 ETCD_VERSION=2.3.7
-KUBERNETES_VERSION=1.3.7
+KUBERNETES_VERSION=1.4.0
 DOCKER_VERSION=1.12.1
 ```
 
