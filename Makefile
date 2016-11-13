@@ -1,9 +1,10 @@
-.PHONY: default clean dist-clean add-box del-box
+.PHONY: default
 
 VERSION=1.4.6
 
 default: stripped.box box.meta
 
+.PHONY: add-box del-box
 add-box: stripped.box
 	vagrant box add vagrant-kubernetes stripped.box -f
 
@@ -47,7 +48,12 @@ stripped.box: tmp/Vagrantfile
 box.meta: stripped.box box-metadata.sh
 	./box-metadata.sh stripped.box ${VERSION} box.meta
 
-clean: ; \
+.PHONY: test
+test: add-box
+	test/test.sh
+
+.PHONY: clean dist-clean
+clean:
 	vagrant destroy -f
 	rm -f package.box
 	rm -rf tmp

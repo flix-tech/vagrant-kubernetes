@@ -116,8 +116,6 @@ kubectl create -f /etc/kubernetes/manifests/kube-master.yml
 kubectl create -f /etc/kubernetes/manifests/kube-dns.yml
 kubectl create -f /etc/kubernetes/manifests/kube-dashboard.yml
 
-# TODO wait for kube-dns to show up
-
 # Clear tmp dir, because otherwise vagrant user would not have access
 # See kubectl apply --schema-cache-dir=
 rm -rf /tmp/kubectl.schema/
