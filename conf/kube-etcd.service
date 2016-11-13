@@ -3,8 +3,6 @@ Description=Kubernetes etcd cluster
 
 [Service]
 ExecStart=/usr/bin/etcd \
---addr=127.0.0.1:4001 \
---bind-addr=0.0.0.0:4001 \
 --data-dir=/var/etcd/data
 Restart=always
 RestartSec=10

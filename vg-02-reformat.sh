@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-set -o verbose
-set -o errexit
+set -euv -o pipefail
 
 # Zero everything to save space
 mkswap /dev/sda2
@@ -8,7 +7,6 @@ SWAPUUID=$(blkid /dev/sda2 -s UUID | cut -f 2 -d '=' | tr -d '"' )
 echo "UUID=${SWAPUUID} none            swap    sw              0       0" >> /etc/fstab
 
 rm -rf /var/log/installer/
-find /vagrant/ -mindepth 1 -delete
 
 # Clean up unused space
 dd if=/dev/zero of=/EMPTY bs=64k || true

@@ -1,5 +1,5 @@
 etcd-v*.tar.gz
-kubernetes-v*.tar.gz
+kubernetes-server-v*.tar.gz
 .vagrant/
 .idea/
 tmp/

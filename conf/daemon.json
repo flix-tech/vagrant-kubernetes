@@ -1,0 +1,8 @@
+{
+  "fixed-cidr": "${DOCKER_CIRD}",
+  "bridge": "cbr0",
+  "iptables": false,
+  "ip-masq": false,
+  "storage-driver": "overlay2",
+  "log-level": "warn"
+}

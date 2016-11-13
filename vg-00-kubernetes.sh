@@ -1,10 +1,11 @@
-#!/bin/sh
-set -o verbose
-set -o errexit
+#!/usr/bin/env bash
+set -euv -o pipefail
 
-ETCD_VERSION=2.3.7
-KUBERNETES_VERSION=1.4.0
-DOCKER_VERSION=1.12.1
+ETCD_VERSION=3.0.15
+KUBERNETES_VERSION=1.4.6
+DOCKER_VERSION=1.12.3
+
+KUBERNETES_SERVER_SHA256=f0a60c45f3360696431288826e56df3b8c18c1dc6fc3f0ea83409f970395e38f
 
 NET_CIRD=10.10.0.0/24
 DOCKER_CIRD=10.10.0.128/25
@@ -14,21 +15,18 @@ BRIDGE_MASK=255.255.255.0
 
 PORTAL_CIRD=10.0.0.0/24
 CLUSTERDNS_IP=10.0.0.10
-DNS_DOMAIN=mfb.local
-
-MACADDRESS=08:00:27:16:5e:4c
+DNS_DOMAIN=k8s.local
 
 # Overwrite Vboxnameserver because of bad performance on OSX
 echo "supersede domain-name-servers 8.8.8.8, 8.8.4.4;" >> /etc/dhcp/dhclient.conf
 printf "nameserver 8.8.8.8\nnameserver 8.8.4.4\n" > /etc/resolv.conf
 
 # Disable all docker networking stuff, we will set it up manually
-mkdir -p /etc/systemd/system/docker.service.d/
-sed -e "s%\${DOCKER_CIRD}%${DOCKER_CIRD}%g" /vagrant/conf/docker-override.conf > /etc/systemd/system/docker.service.d/override.conf
+mkdir -p /etc/docker/
+sed -e "s%\${DOCKER_CIRD}%${DOCKER_CIRD}%g" /vagrant/conf/daemon.json > /etc/docker/daemon.json
 
 # Setup the bridge for docker, we connect it with the VirtualBox network (eth1)
 sed -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%g" -e "s%\${BRIDGE_MASK}%${BRIDGE_MASK}%g" /vagrant/conf/cbr0 > /etc/network/interfaces.d/cbr0
-echo hwaddress ether ${MACADDRESS} >> /etc/network/interfaces
 
 cp /vagrant/conf/vagrant-startup.service /etc/systemd/system/vagrant-startup.service
 
@@ -50,26 +48,25 @@ apt-get --quiet --yes --force-yes purge rsyslog
 
 # docker
 echo "deb http://apt.dockerproject.org/repo debian-jessie main" > /etc/apt/sources.list.d/docker.list
-# Alternative keyserver hkp://pgp.mit.edu:80
-apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
 # sysdig
 echo 'deb http://download.draios.com/stable/deb stable-$(ARCH)/' > /etc/apt/sources.list.d/sysdig.list
 wget -qO- https://s3.amazonaws.com/download.draios.com/DRAIOS-GPG-KEY.public | apt-key add -
-# Enable contrib for virtual-box-guest-additions
-sed -i -e 's/main/main contrib/' /etc/apt/sources.list
+echo deb http://ftp.debian.org/debian jessie-backports main contrib >/etc/apt/sources.list.d/backports.list
 
 export DEBIAN_FRONTEND=noninteractive
+
+systemctl mask docker
 
 apt-get --quiet update
 apt-get --quiet --yes dist-upgrade
 # Install bridge-utils first, so that we can get the bridget for docker up
+apt-get --quiet --yes --target-release jessie-backports -o Dpkg::Options::="--force-confnew" install linux-image-amd64 linux-headers-amd64 systemd virtualbox-guest-dkms virtualbox-guest-utils
 apt-get --quiet --yes --no-install-recommends install \
     bridge-utils ethtool htop vim curl \
-    build-essential virtualbox-guest-dkms virtualbox-guest-utils # for virtualbox guest plugin
-ifup cbr0
-apt-get --quiet --yes --no-install-recommends install \
+    build-essential \
     docker-engine=${DOCKER_VERSION}-0~jessie \
-    sysdig linux-headers-$(uname -r) bindfs # For sysdig # bindfs is for fixing NFS mount permissions
+    sysdig bindfs # For sysdig # bindfs is for fixing NFS mount permissions
 
 # Add vagrant user to docker group, so that vagrant can user docker without sudo
 usermod -aG docker vagrant
@@ -80,14 +77,16 @@ fi
 tar xzf /vagrant/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz --strip-components=1 etcd-v${ETCD_VERSION}-linux-amd64/etcd etcd-v${ETCD_VERSION}-linux-amd64/etcdctl
 mv etcd etcdctl /usr/bin
 
-if [ ! -f /vagrant/kubernetes-v${KUBERNETES_VERSION}.tar.gz ]; then
-    curl -sSL https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/kubernetes.tar.gz -o /vagrant/kubernetes-v${KUBERNETES_VERSION}.tar.gz
+if [ ! -f /vagrant/kubernetes-server-v${KUBERNETES_VERSION}.tar.gz ]; then
+    curl -sSL https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/kubernetes-server-linux-amd64.tar.gz -o  /vagrant/kubernetes-server-v${KUBERNETES_VERSION}.tar.gz
 fi
-tar -xf /vagrant/kubernetes-v${KUBERNETES_VERSION}.tar.gz
-tar -xf kubernetes/server/kubernetes-server-linux-amd64.tar.gz --strip-components=3 kubernetes/server/bin/kubectl kubernetes/server/bin/hyperkube
+sha256sum /vagrant/kubernetes-server-v${KUBERNETES_VERSION}.tar.gz | grep -q ${KUBERNETES_SERVER_SHA256}
+tar -xf /vagrant/kubernetes-server-v${KUBERNETES_VERSION}.tar.gz --strip-components=3 kubernetes/server/bin/kubectl kubernetes/server/bin/hyperkube
 rm -rf kubernetes
 mv hyperkube kubectl /usr/bin
-chmod +x /usr/bin/kubectl
+chmod +x /usr/bin/kubectl /usr/bin/hyperkube
+
+kubectl completion bash > /etc/bash_completion.d/kubectl
 
 sed -e "s%\${PORTAL_CIRD}%${PORTAL_CIRD}%g" /vagrant/conf/kube-apiserver.service > /etc/systemd/system/kube-apiserver.service
 sed -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%g" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%g" -e "s%\${DNS_DOMAIN}%${DNS_DOMAIN}%g" /vagrant/conf/kubelet.service > /etc/systemd/system/kubelet.service
@@ -147,6 +146,8 @@ update-grub
 mkdir /sock/
 chown vagrant /sock/
 #echo 'ln $SSH_AUTH_SOCK /sock/sock' >> /home/vagrant/.bashrc
+
+systemctl unmask docker
 
 # cleanup
 apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
