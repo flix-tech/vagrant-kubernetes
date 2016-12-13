@@ -6,13 +6,12 @@ After=docker.service
 
 [Service]
 ExecStart=/usr/bin/hyperkube kubelet \
---config=/etc/kubernetes/manifests/ \
 --logtostderr=true \
+--kubeconfig=/etc/kubeconfig.yml \
+--require-kubeconfig \
 --hostname-override=${BRIDGE_IP} \
 --address=0.0.0.0 \
 --api-servers=http://localhost:8080 \
---configure-cbr0=false \
---resource-container= \
 --cluster-dns=${CLUSTERDNS_IP} \
 --cluster-domain=${DNS_DOMAIN}
 Restart=always

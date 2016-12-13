@@ -2,10 +2,10 @@
 set -euv -o pipefail
 
 ETCD_VERSION=3.0.15
-KUBERNETES_VERSION=1.4.6
-DOCKER_VERSION=1.12.3
+KUBERNETES_VERSION=1.5.0
+DOCKER_VERSION=1.12.4
 
-KUBERNETES_SERVER_SHA256=f0a60c45f3360696431288826e56df3b8c18c1dc6fc3f0ea83409f970395e38f
+KUBERNETES_SERVER_SHA256=b9c122d709c0556c1e19d31d98bf26ee530f91c0119f4454fb930cef5a0c1aa7
 
 NET_CIRD=10.10.0.0/24
 DOCKER_CIRD=10.10.0.128/25
@@ -65,7 +65,7 @@ apt-get --quiet --yes --target-release jessie-backports -o Dpkg::Options::="--fo
 apt-get --quiet --yes --no-install-recommends install \
     bridge-utils ethtool htop vim curl \
     build-essential \
-    docker-engine=${DOCKER_VERSION}-0~jessie \
+    docker-engine=${DOCKER_VERSION}-0~debian-jessie \
     sysdig bindfs # For sysdig # bindfs is for fixing NFS mount permissions
 
 # Add vagrant user to docker group, so that vagrant can user docker without sudo
@@ -87,6 +87,8 @@ mv hyperkube kubectl /usr/bin
 chmod +x /usr/bin/kubectl /usr/bin/hyperkube
 
 kubectl completion bash > /etc/bash_completion.d/kubectl
+
+cp /vagrant/conf/kubeconfig.yml /etc/kubeconfig.yml
 
 sed -e "s%\${PORTAL_CIRD}%${PORTAL_CIRD}%g" /vagrant/conf/kube-apiserver.service > /etc/systemd/system/kube-apiserver.service
 sed -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%g" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%g" -e "s%\${DNS_DOMAIN}%${DNS_DOMAIN}%g" /vagrant/conf/kubelet.service > /etc/systemd/system/kubelet.service
