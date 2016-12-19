@@ -1,6 +1,6 @@
 .PHONY: default
 
-VERSION=1.5.0
+VERSION=1.5.1
 
 default: stripped.box box.meta
 
