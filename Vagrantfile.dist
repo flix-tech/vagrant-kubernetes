@@ -1,3 +1,9 @@
+vboxVersion = `vboxmanage --version`
+
+if Gem::Version.new(vboxVersion) < Gem::Version.new('5.1')
+  throw "VirtualBox version too old. Please upgrade to 5.1"
+end
+
 Vagrant.configure(2) do |config|
     # Create a private network, which allows host-only access to the machine
   # using a specific IP.

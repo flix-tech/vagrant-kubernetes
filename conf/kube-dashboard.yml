@@ -15,12 +15,12 @@ spec:
     metadata:
        labels:
          k8s-app: kubernetes-dashboard
-         version: v1.4.0
+         version: v1.6.1
          kubernetes.io/cluster-service: "true"
     spec:
       containers:
       - name: kubernetes-dashboard
-        image: gcr.io/google_containers/kubernetes-dashboard-amd64:v1.4.0
+        image: gcr.io/google_containers/kubernetes-dashboard-amd64:v1.6.1
         ports:
         - containerPort: 9090
           protocol: TCP

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euv -o pipefail
 
-ETCD_VERSION=3.0.15
-KUBERNETES_VERSION=1.5.1
-DOCKER_VERSION=1.12.5
+ETCD_VERSION=3.1.8
+KUBERNETES_VERSION=1.6.4
+DOCKER_VERSION=17.03.1
 
-KUBERNETES_SERVER_SHA256=871a9f35e1c73f571b7113e01a91d7bfc5bfe3501e910c921a18313774b25fd1
+KUBERNETES_SERVER_SHA256=76a1d6dbce630b50fd3a5f566fcea6ef1a04996cf4f4c568338a3db0d3b6a3d5
 
 NET_CIRD=10.10.0.0/24
 DOCKER_CIRD=10.10.0.128/25
@@ -43,12 +43,15 @@ echo "SystemMaxUse=1G" >> /etc/systemd/journald.conf
 # Give the vagrant user full access to the journal
 usermod -a -G systemd-journal vagrant
 # Remove rsyslog
-apt-get --quiet --yes --force-yes purge rsyslog
+apt-get --quiet --yes purge rsyslog
+
+apt-get --quiet update
+apt-get --quiet --yes install apt-transport-https
 
 
 # docker
-echo "deb http://apt.dockerproject.org/repo debian-jessie main" > /etc/apt/sources.list.d/docker.list
-apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+echo "deb https://download.docker.com/linux/debian stretch stable" > /etc/apt/sources.list.d/docker.list
+wget -qO- https://download.docker.com/linux/debian/gpg | apt-key add -
 # sysdig
 echo 'deb http://download.draios.com/stable/deb stable-$(ARCH)/' > /etc/apt/sources.list.d/sysdig.list
 wget -qO- https://s3.amazonaws.com/download.draios.com/DRAIOS-GPG-KEY.public | apt-key add -
@@ -60,13 +63,12 @@ systemctl mask docker
 
 apt-get --quiet update
 apt-get --quiet --yes dist-upgrade
+echo 'deb http://http.us.debian.org/debian sid main non-free contrib' > /etc/apt/sources.list.d/unstable.list
 # Install bridge-utils first, so that we can get the bridget for docker up
-apt-get --quiet --yes --target-release jessie-backports -o Dpkg::Options::="--force-confnew" install linux-image-amd64 linux-headers-amd64 systemd virtualbox-guest-dkms virtualbox-guest-utils
 apt-get --quiet --yes --no-install-recommends install \
     bridge-utils ethtool htop vim curl \
-    build-essential \
-    docker-engine=${DOCKER_VERSION}-0~debian-jessie \
-    sysdig bindfs # For sysdig # bindfs is for fixing NFS mount permissions
+    docker-ce=${DOCKER_VERSION}~ce-0~debian-stretch \
+    sysdig-dkms bindfs # For sysdig # bindfs is for fixing NFS mount permissions
 
 # Add vagrant user to docker group, so that vagrant can user docker without sudo
 usermod -aG docker vagrant
