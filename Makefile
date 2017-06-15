@@ -1,11 +1,11 @@
 .PHONY: default
 
-VERSION=1.6.3
+VERSION=1.6.4
 
 default: stripped.box box.meta
 
 .PHONY: add-box del-box
-add-box: stripped.box
+add-box:
 	vagrant box add vagrant-kubernetes stripped.box -f
 
 del-box:

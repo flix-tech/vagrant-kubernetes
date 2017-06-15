@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euv -o pipefail
 
-ETCD_VERSION=3.1.8
+ETCD_VERSION=3.2.0
 KUBERNETES_VERSION=1.6.4
 DOCKER_VERSION=17.03.1
 
@@ -39,7 +39,7 @@ systemctl start vagrant-startup
 mkdir -p /var/log/journal
 chgrp systemd-journal /var/log/journal
 chmod g+rwx /var/log/journal
-echo "SystemMaxUse=1G" >> /etc/systemd/journald.conf
+echo "SystemMaxUse=256M" >> /etc/systemd/journald.conf
 # Give the vagrant user full access to the journal
 usermod -a -G systemd-journal vagrant
 # Remove rsyslog
@@ -55,7 +55,6 @@ wget -qO- https://download.docker.com/linux/debian/gpg | apt-key add -
 # sysdig
 echo 'deb http://download.draios.com/stable/deb stable-$(ARCH)/' > /etc/apt/sources.list.d/sysdig.list
 wget -qO- https://s3.amazonaws.com/download.draios.com/DRAIOS-GPG-KEY.public | apt-key add -
-echo deb http://ftp.debian.org/debian jessie-backports main contrib >/etc/apt/sources.list.d/backports.list
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -68,7 +67,7 @@ echo 'deb http://http.us.debian.org/debian sid main non-free contrib' > /etc/apt
 apt-get --quiet --yes --no-install-recommends install \
     bridge-utils ethtool htop vim curl \
     docker-ce=${DOCKER_VERSION}~ce-0~debian-stretch \
-    sysdig-dkms bindfs # For sysdig # bindfs is for fixing NFS mount permissions
+    sysdig sysdig-dkms bindfs # For sysdig # bindfs is for fixing NFS mount permissions
 
 # Add vagrant user to docker group, so that vagrant can user docker without sudo
 usermod -aG docker vagrant

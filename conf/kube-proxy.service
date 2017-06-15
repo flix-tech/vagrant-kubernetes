@@ -1,7 +1,7 @@
 [Unit]
 Description=Kubernetes Kubeproxy
 Documentation=https://github.com/kubernetes/kubernetes
-Wants=kube-api-server.service
+Wants=kube-apiserver.service
 
 [Service]
 ExecStart=/usr/bin/hyperkube proxy \

@@ -1,15 +1,15 @@
 [Unit]
 Description=Kubernetes Controller Manager
 Documentation=https://github.com/kubernetes/kubernetes
-Wants=kube-api-server.service
+Wants=kube-apiserver.service
 
 [Service]
 Restart=always
 RestartSec=10
 ExecStart=/usr/bin/hyperkube controller-manager \
 --master=127.0.0.1:8080 \
---service-account-private-key-file=/var/run/kubernetes/apiserver.key \
---root-ca-file=/var/run/kubernetes/apiserver.crt \
+--service-account-private-key-file=/var/lib/kubernetes/apiserver.key \
+--root-ca-file=/var/lib/kubernetes/apiserver.crt \
 
 [Install]
 WantedBy=multi-user.target

@@ -1,7 +1,7 @@
 [Unit]
 Description=Kubernetes Kubelet
 Documentation=https://github.com/kubernetes/kubernetes
-Wants=docker.service kube-api-server.service
+Wants=docker.service kube-apiserver.service
 After=docker.service
 
 [Service]
@@ -11,7 +11,7 @@ ExecStart=/usr/bin/hyperkube kubelet \
 --require-kubeconfig \
 --hostname-override=${BRIDGE_IP} \
 --address=0.0.0.0 \
---api-servers=http://localhost:8080 \
+--serialize-image-pulls=false \
 --cluster-dns=${CLUSTERDNS_IP} \
 --cluster-domain=${DNS_DOMAIN}
 Restart=always
