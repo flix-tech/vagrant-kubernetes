@@ -62,7 +62,6 @@ systemctl mask docker
 
 apt-get --quiet update
 apt-get --quiet --yes dist-upgrade
-echo 'deb http://http.us.debian.org/debian sid main non-free contrib' > /etc/apt/sources.list.d/unstable.list
 # Install bridge-utils first, so that we can get the bridget for docker up
 apt-get --quiet --yes --no-install-recommends install \
     bridge-utils ethtool htop vim curl \
@@ -149,6 +148,3 @@ chown vagrant /sock/
 #echo 'ln $SSH_AUTH_SOCK /sock/sock' >> /home/vagrant/.bashrc
 
 systemctl unmask docker
-
-# cleanup
-apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
