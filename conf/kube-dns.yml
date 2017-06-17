@@ -142,7 +142,7 @@ spec:
         - --v=0
         - --logtostderr
         - --probe=kubedns,127.0.0.1:10053,kubernetes.default.svc.${DNS_DOMAIN},5,A
-        - --probe=dnsmasq,127.0.0.1:53,kubernetes.default.svc.cluster.${DNS_DOMAIN},5,A
+        - --probe=dnsmasq,127.0.0.1:53,kubernetes.default.svc.${DNS_DOMAIN},5,A
         ports:
         - containerPort: 10054
           name: metrics

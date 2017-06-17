@@ -114,9 +114,9 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:8080); d
     sleep 1
 done
 
-kubectl create -f /etc/kubernetes/manifests/kube-master.yml
-kubectl create -f /etc/kubernetes/manifests/kube-dns.yml
-kubectl create -f /etc/kubernetes/manifests/kube-dashboard.yml
+kubectl apply -f /etc/kubernetes/manifests/kube-master.yml
+kubectl apply -f /etc/kubernetes/manifests/kube-dns.yml
+kubectl apply -f /etc/kubernetes/manifests/kube-dashboard.yml
 
 # Clear tmp dir, because otherwise vagrant user would not have access
 # See kubectl apply --schema-cache-dir=
