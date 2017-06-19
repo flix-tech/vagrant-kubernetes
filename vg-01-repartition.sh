@@ -19,6 +19,9 @@ apt-get -y remove linux-headers-$(uname -r)
 # cleanup
 apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+umount /vagrant || true
+rm -r /vagrant/*
+
 swapoff /dev/sda5
 
 SWAPUUID=$(blkid /dev/sda5 -s UUID | cut -f 2 -d '=' | tr -d '"' )
