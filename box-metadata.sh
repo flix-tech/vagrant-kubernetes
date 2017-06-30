@@ -7,6 +7,7 @@ if [[ "$OSTYPE" == darwin* ]]; then
     CHECKSUM=`shasum -a 256 ${FILE} | cut -f 1 -d ' '`
 else
     CHECKSUM=`sha256sum ${FILE} | cut -f 1 -d ' '`
+fi
 
 cat << EOF > $3
 {
