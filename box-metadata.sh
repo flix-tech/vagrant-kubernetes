@@ -2,7 +2,11 @@
 
 FILE=$1
 VERSION=$2
-CHECKSUM=`sha256sum ${FILE} | cut -f 1 -d ' '`
+
+if [[ "$OSTYPE" == darwin* ]]; then
+    CHECKSUM=`shasum -a 256 ${FILE} | cut -f 1 -d ' '`
+else
+    CHECKSUM=`sha256sum ${FILE} | cut -f 1 -d ' '`
 
 cat << EOF > $3
 {
