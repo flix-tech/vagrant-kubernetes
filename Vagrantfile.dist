@@ -1,7 +1,11 @@
-vboxVersion = `vboxmanage --version`
+begin
+    vboxVersion = `vboxmanage --version`
 
-if Gem::Version.new(vboxVersion) < Gem::Version.new('5.1')
-  throw "VirtualBox version too old. Please upgrade to 5.1"
+    if Gem::Version.new(vboxVersion) < Gem::Version.new('5.1')
+      throw "VirtualBox version too old. Please upgrade to 5.1"
+    end
+rescue
+    print "Could not determine Virtual Box version. Continuing"
 end
 
 Vagrant.configure(2) do |config|
