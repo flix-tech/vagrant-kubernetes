@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euv -o pipefail
 
-ETCD_VERSION=3.2.3
-KUBERNETES_VERSION=1.7.1
-DOCKER_VERSION=17.03.1
+ETCD_VERSION=3.2.6
+KUBERNETES_VERSION=1.7.4
+DOCKER_VERSION=17.06.0
 
-KUBERNETES_SERVER_SHA256=467201c89d473bdec82a67c9b24453a2037eef1a1ed552f0dc55310355d21ea3
+KUBERNETES_SERVER_SHA256=09c420fdb9b912c172b19638d67b27bc7994e2608185051f412804fa55790076
 
 NET_CIRD=10.10.0.0/24
 DOCKER_CIRD=10.10.0.128/25
@@ -65,7 +65,7 @@ apt-get --quiet --yes dist-upgrade
 # Install bridge-utils first, so that we can get the bridget for docker up
 apt-get --quiet --yes --no-install-recommends install \
     bridge-utils ethtool htop vim curl \
-    docker-ce=${DOCKER_VERSION}~ce-0~debian-stretch \
+    docker-ce=${DOCKER_VERSION}~ce-0~debian \
     sysdig sysdig-dkms bindfs # For sysdig # bindfs is for fixing NFS mount permissions
 
 # Add vagrant user to docker group, so that vagrant can user docker without sudo
