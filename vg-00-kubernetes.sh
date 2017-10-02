@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euv -o pipefail
 
-ETCD_VERSION=3.2.6
-KUBERNETES_VERSION=1.7.4
+ETCD_VERSION=3.2.8
+KUBERNETES_VERSION=1.8.0
 DOCKER_VERSION=17.06.0
 
-KUBERNETES_SERVER_SHA256=09c420fdb9b912c172b19638d67b27bc7994e2608185051f412804fa55790076
+KUBERNETES_SERVER_SHA256=23422a7f11c3eab59d686a52abae1bce2f9e2a0916f98ed05c10591ba9c3cbad
 
 NET_CIRD=10.10.0.0/24
 DOCKER_CIRD=10.10.0.128/25
@@ -113,6 +113,9 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:8080); d
     printf '.'
     sleep 1
 done
+
+# Give it a bit more time to load everything
+sleep 2
 
 kubectl apply -f /etc/kubernetes/manifests/kube-master.yml
 kubectl apply -f /etc/kubernetes/manifests/kube-dns.yml

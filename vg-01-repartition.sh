@@ -6,16 +6,6 @@ until $(kubectl --namespace=kube-system get pods | grep -q '^kube-dns.*3/3.*$');
 done
 set -euv
 
-# Install additions after reboot, so we have the correct running kernel
-VBOX_VERSION=5.1.22
-apt-get install -yq --no-install-recommends linux-headers-$(uname -r)
-wget http://download.virtualbox.org/virtualbox/${VBOX_VERSION}/VBoxGuestAdditions_${VBOX_VERSION}.iso -qO vbox.iso
-mount -o loop vbox.iso /mnt
-/mnt/VBoxLinuxAdditions.run --nox11
-umount /mnt
-rm vbox.iso
-apt-get -y remove linux-headers-$(uname -r)
-
 # cleanup
 apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
 
