@@ -105,9 +105,6 @@ sed -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%g" /vagrant/conf/kube-master.yml > /etc/kub
 sed -e "s%\${DNS_DOMAIN}%${DNS_DOMAIN}%g" -e "s%\${CLUSTERDNS_IP}%${CLUSTERDNS_IP}%g" /vagrant/conf/kube-dns.yml > /etc/kubernetes/manifests/kube-dns.yml
 cp /vagrant/conf/kube-dashboard.yml /etc/kubernetes/manifests/kube-dashboard.yml
 
-# Install sysdig
-echo "export SYSDIG_K8S_API=http://127.0.0.1:8080" >> /etc/profile.d/sysdig.sh
-
 echo "Waiting for API server to show up"
 until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do
     printf '.'
@@ -120,6 +117,8 @@ sleep 2
 kubectl apply -f /etc/kubernetes/manifests/kube-master.yml
 kubectl apply -f /etc/kubernetes/manifests/kube-dns.yml
 kubectl apply -f /etc/kubernetes/manifests/kube-dashboard.yml
+
+kubectl --namespace kube-system run --image flixtech/k8s-mdns:0.2 k8s-mdns
 
 # Clear tmp dir, because otherwise vagrant user would not have access
 # See kubectl apply --schema-cache-dir=
