@@ -1,6 +1,6 @@
 .PHONY: default
 
-VERSION=1.8.3-r1
+VERSION=1.9.0
 
 default: stripped.box box.meta
 
@@ -12,7 +12,7 @@ del-box:
 	vagrant box remove kubernetes
 
 .vagrant/machines/default/virtualbox/id: vg-00-kubernetes.sh conf/*
-	vagrant destroy -f
+	vagrant destroy -f || true
 	SCRIPT=vg-00-kubernetes.sh vagrant up --provision
 	vagrant halt
 
@@ -54,7 +54,7 @@ test: add-box
 
 .PHONY: clean dist-clean
 clean:
-	vagrant destroy -f
+	vagrant destroy -f || true
 	rm -f package.box
 	rm -rf tmp
 	rm -rf cloned.vdi

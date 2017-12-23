@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euv -o pipefail
 
-ETCD_VERSION=3.2.9
-KUBERNETES_VERSION=1.8.3
-DOCKER_VERSION=17.09.0
+ETCD_VERSION=3.2.12
+KUBERNETES_VERSION=1.9.0
+DOCKER_VERSION=17.09.1
 
-KUBERNETES_SERVER_SHA256=557c231a63f5975d08565dd690381bd63d9db14528da07c7e86305a82fbd9c8b
+KUBERNETES_SERVER_SHA256=a8d7be19e3b662681dc50dc0085ca12045979530a27d0200cf986ada3eff4d32
 
 NET_CIRD=10.10.0.0/24
 DOCKER_CIRD=10.10.0.128/25
@@ -52,9 +52,6 @@ apt-get --quiet --yes install apt-transport-https
 # docker
 echo "deb https://download.docker.com/linux/debian stretch stable" > /etc/apt/sources.list.d/docker.list
 wget -qO- https://download.docker.com/linux/debian/gpg | apt-key add -
-# sysdig
-echo 'deb http://download.draios.com/stable/deb stable-$(ARCH)/' > /etc/apt/sources.list.d/sysdig.list
-wget -qO- https://s3.amazonaws.com/download.draios.com/DRAIOS-GPG-KEY.public | apt-key add -
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -66,7 +63,7 @@ apt-get --quiet --yes dist-upgrade
 apt-get --quiet --yes --no-install-recommends install \
     bridge-utils ethtool htop vim curl \
     docker-ce=${DOCKER_VERSION}~ce-0~debian \
-    sysdig sysdig-dkms bindfs # For sysdig # bindfs is for fixing NFS mount permissions
+    bindfs # For sysdig # bindfs is for fixing NFS mount permissions
 
 # Add vagrant user to docker group, so that vagrant can user docker without sudo
 usermod -aG docker vagrant
