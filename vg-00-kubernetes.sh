@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euv -o pipefail
 
-ETCD_VERSION=3.2.12
-KUBERNETES_VERSION=1.9.0
-DOCKER_VERSION=17.09.1
+ETCD_VERSION=3.3.2
+KUBERNETES_VERSION=1.10.0
+DOCKER_VERSION=18.03.0
 
-KUBERNETES_SERVER_SHA256=a8d7be19e3b662681dc50dc0085ca12045979530a27d0200cf986ada3eff4d32
+KUBERNETES_SERVER_SHA256=f2e0505bee7d9217332b96be11d1b88c06f51049f7a44666b0ede80bfb92fdf6
 
 NET_CIRD=10.10.0.0/24
 DOCKER_CIRD=10.10.0.128/25
@@ -95,7 +95,7 @@ cp /vagrant/conf/kube-controller-manager.service \
    /vagrant/conf/kube-etcd.service \
   /etc/systemd/system/
 systemctl enable kubelet kube-apiserver kube-controller-manager kube-scheduler kube-proxy kube-etcd
-systemctl start kubelet kube-apiserver kube-controller-manager kube-scheduler kube-proxy kube-etcd
+systemctl start kube-apiserver kube-controller-manager kube-scheduler kube-proxy kube-etcd
 
 mkdir -p /etc/kubernetes/manifests
 sed -e "s%\${BRIDGE_IP}%${BRIDGE_IP}%g" /vagrant/conf/kube-master.yml > /etc/kubernetes/manifests/kube-master.yml
