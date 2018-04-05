@@ -1,0 +1,7 @@
+-
+  hosts: all
+  any_errors_fatal: true
+  pre_tasks:
+    - include_vars: vars.yml
+  roles:
+    - kubernetes

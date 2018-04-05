@@ -2,6 +2,7 @@
 Description=Kubernetes Controller Manager
 Documentation=https://github.com/kubernetes/kubernetes
 Wants=kube-apiserver.service
+After=kube-apiserver.service
 
 [Service]
 Restart=always

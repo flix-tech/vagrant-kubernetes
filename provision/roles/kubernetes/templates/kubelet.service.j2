@@ -2,17 +2,17 @@
 Description=Kubernetes Kubelet
 Documentation=https://github.com/kubernetes/kubernetes
 Wants=docker.service kube-apiserver.service
-After=docker.service
+After=docker.service kube-apiserver.service
 
 [Service]
 ExecStart=/usr/bin/hyperkube kubelet \
 --logtostderr=true \
 --kubeconfig=/etc/kubeconfig.yml \
---hostname-override=${BRIDGE_IP} \
+--hostname-override={{ BRIDGE_IP }} \
 --address=0.0.0.0 \
 --serialize-image-pulls=false \
---cluster-dns=${CLUSTERDNS_IP} \
---cluster-domain=${DNS_DOMAIN} \
+--cluster-dns={{ CLUSTERDNS_IP }} \
+--cluster-domain={{ DNS_DOMAIN }} \
 --fail-swap-on=false
 Restart=always
 Type=notify

@@ -25,6 +25,9 @@ Vagrant.configure(2) do |config|
 
   # Enable provisioning with a shell script.
   if ENV['SCRIPT']
-    config.vm.provision "shell", path: ENV['SCRIPT']
+    config.vm.provision "ansible" do |ansible|
+      ansible.playbook = ENV['SCRIPT']
+      ansible.become = true
+    end
   end
 end

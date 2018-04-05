@@ -1,0 +1,20 @@
+-
+  hosts: all
+  any_errors_fatal: true
+  pre_tasks:
+    - include_vars: vars.yml
+  tasks:
+  - shell: apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
+    warn: False
+  - command: "swapoff /dev/sda5"
+  - command: dd if=/dev/zero of=/dev/sda5 bs=64k
+    ignore_errors: yes
+  - shell: |
+      sed -e 's/\t\([\+0-9a-zA-Z]*\)[ \t].*/\1/' | fdisk /dev/sda || true
+    args:
+      stdin: "{{ lookup('file', 'fdisk') }}"
+      warn: false
+  - lineinfile:
+      regexp: swap
+      path: /etc/fstab
+      state: absent

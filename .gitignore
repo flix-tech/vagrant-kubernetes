@@ -7,3 +7,4 @@ package.box
 stripped.box
 cloned.vdi
 box.meta
+*.retry

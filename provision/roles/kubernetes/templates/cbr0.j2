@@ -1,0 +1,5 @@
+auto cbr0
+iface cbr0 inet static
+    address {{ BRIDGE_IP }}
+    netmask {{ BRIDGE_MASK }}
+    bridge_ports eth1

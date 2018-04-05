@@ -6,7 +6,7 @@ metadata:
   name: kubernetes-insecure
   namespace: default
 spec:
-  clusterIP: 10.0.0.2
+  clusterIP: {{ KUBERNETES_INSECURE_IP }}
   ports:
   - port: 80
     protocol: TCP
@@ -20,7 +20,7 @@ metadata:
   namespace: default
 subsets:
 - addresses:
-  - ip: ${BRIDGE_IP}
+  - ip: {{ BRIDGE_IP }}
   ports:
   - port: 8080
     protocol: TCP

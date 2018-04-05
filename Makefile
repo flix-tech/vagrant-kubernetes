@@ -11,9 +11,9 @@ add-box:
 del-box:
 	vagrant box remove kubernetes
 
-.vagrant/machines/default/virtualbox/id: vg-00-kubernetes.sh conf/*
+.vagrant/machines/default/virtualbox/id: vg-00-kubernetes.sh
 	vagrant destroy -f || true
-	SCRIPT=vg-00-kubernetes.sh vagrant up --provision
+	SCRIPT=provision/01-playbook-kubernetes.yml vagrant up --provision
 	vagrant halt
 
 .vagrant/repartinioned: .vagrant/machines/default/virtualbox/id vg-*.sh
@@ -27,8 +27,10 @@ del-box:
 	VBoxManage clonehd cloned.vdi $(HDDFILE) --format vmdk
 	VBoxManage storageattach $(MACHINEID) --storagectl "SATA Controller" --port 0 --type hdd --medium $(HDDFILE)
 	VBoxManage closemedium disk cloned.vdi --delete
-	SCRIPT=vg-01-repartition.sh vagrant reload --provision
-	SCRIPT=vg-02-reformat.sh vagrant reload --provision
+	SCRIPT=provision/02-playbook-repartition.yml vagrant reload --provision
+	vagrant halt
+	SCRIPT=provision/03-playbook-reformat.yml vagrant reload --provision
+	vagrant halt
 	touch .vagrant/repartinioned
 
 package.box: .vagrant/repartinioned Vagrantfile.dist

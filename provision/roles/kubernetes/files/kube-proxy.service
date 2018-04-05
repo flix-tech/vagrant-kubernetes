@@ -1,10 +1,11 @@
 [Unit]
-Description=Kubernetes Scheduler
+Description=Kubernetes Kubeproxy
 Documentation=https://github.com/kubernetes/kubernetes
 Wants=kube-apiserver.service
+After=kube-apiserver.service
 
 [Service]
-ExecStart=/usr/bin/hyperkube scheduler \
+ExecStart=/usr/bin/hyperkube proxy \
 --master=127.0.0.1:8080
 Restart=always
 RestartSec=10
