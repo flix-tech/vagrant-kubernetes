@@ -11,12 +11,12 @@ add-box:
 del-box:
 	vagrant box remove kubernetes
 
-.vagrant/machines/default/virtualbox/id: vg-00-kubernetes.sh
+.vagrant/machines/default/virtualbox/id:
 	vagrant destroy -f || true
 	SCRIPT=provision/01-playbook-kubernetes.yml vagrant up --provision
 	vagrant halt
 
-.vagrant/repartinioned: .vagrant/machines/default/virtualbox/id vg-*.sh
+.vagrant/repartinioned: .vagrant/machines/default/virtualbox/id
 	$(eval MACHINEID:=$(shell cat .vagrant/machines/default/virtualbox/id))
 	$(eval HDDFILE:=$(shell VBoxManage showvminfo --machinereadable $(MACHINEID) | grep "SATA Controller-0-0" | cut -d '=' -f 2))
 	test -f cloned.vdi && vboxmanage closemedium disk cloned.vdi --delete || true

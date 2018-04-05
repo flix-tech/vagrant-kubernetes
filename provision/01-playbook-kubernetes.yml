@@ -4,4 +4,5 @@
   pre_tasks:
     - include_vars: vars.yml
   roles:
-    - kubernetes
+    - static
+    - dynamic

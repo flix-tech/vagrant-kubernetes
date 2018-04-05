@@ -1,0 +1,64 @@
+- name: "Download etcd {{ ETCD_VERSION }}"
+  get_url:
+    dest: "/vagrant/etcd-v{{ ETCD_VERSION }}-linux-amd64.tar.gz"
+    url: "https://github.com/coreos/etcd/releases/download/v{{ ETCD_VERSION }}/etcd-v{{ ETCD_VERSION }}-linux-amd64.tar.gz"
+- name: unarchive
+  command: "tar xzf /vagrant/etcd-v{{ ETCD_VERSION }}-linux-amd64.tar.gz --strip-components=1 etcd-v{{ ETCD_VERSION }}-linux-amd64/etcd etcd-v{{ ETCD_VERSION }}-linux-amd64/etcdctl"
+  warn: False
+  args:
+    chdir: /usr/bin
+- name: Fix permissions
+  with_items:
+   - etcd
+   - etcdctl
+  file:
+    path: "/usr/bin/{{ item }}"
+    mode: +x
+
+- name: "Download kubernetes {{ KUBERNETES_VERSION }}"
+  get_url:
+    dest: "/vagrant/kubernetes-server-v{{ KUBERNETES_VERSION }}.tar.gz"
+    url: "https://storage.googleapis.com/kubernetes-release/release/v{{ KUBERNETES_VERSION }}/kubernetes-server-linux-amd64.tar.gz"
+- name: unarchive
+  command: "tar xzf /vagrant/kubernetes-server-v{{ KUBERNETES_VERSION }}.tar.gz --strip-components=3 kubernetes/server/bin/kubectl kubernetes/server/bin/hyperkube"
+  warn: False
+  args:
+    chdir: /usr/bin
+- name: Fix permissions
+  with_items:
+   - hyperkube
+   - kubectl
+  file:
+    path: "/usr/bin/{{ item }}"
+    mode: +x
+- name: Kubectl bash completion
+  shell: "kubectl completion bash > /etc/bash_completion.d/kubectl"
+- copy:
+    src: kubeconfig.yml
+    dest: /etc/kubeconfig.yml
+
+- name:
+  with_items:
+    - kube-controller-manager
+    - kube-scheduler
+    - kube-proxy
+    - kube-etcd
+  copy:
+    src: "{{ item }}.service"
+    dest: "/etc/systemd/system/{{ item }}.service"
+- name: Enable Kubernetes services
+  with_items:
+    - kube-etcd
+    - kube-controller-manager
+    - kube-scheduler
+    - kube-proxy
+  ignore_errors: yes
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+
+- name: Clear tmp dir, because otherwise vagrant user would not have access
+  file:
+    state: absent
+    path: /tmp/kubectl.schema/

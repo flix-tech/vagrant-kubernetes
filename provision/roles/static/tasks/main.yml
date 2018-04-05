@@ -1,0 +1,87 @@
+- name: Overwrite Vboxnameserver because of bad performance on OSX
+  lineinfile:
+    path: /etc/dhcp/dhclient.conf
+    line: 'supersede domain-name-servers 8.8.8.8, 8.8.4.4;'
+- copy:
+    content: "nameserver 8.8.8.8\nnameserver 8.8.4.4\n"
+    dest: /etc/resolv.conf
+
+- name: Configure journald
+  file:
+    path: /var/log/journal
+    state: directory
+    group: systemd-journal
+    mode: g+rwx
+- lineinfile:
+    path: /etc/systemd/journald.conf
+    line: "SystemMaxUse=256M"
+- name: Give the vagrant user full access to the journal
+  user:
+    name: vagrant
+    append: true
+    groups: systemd-journal
+- name: Remove rsyslog
+  apt:
+    name: rsyslog
+    state: absent
+    purge: yes
+
+- name: Install https transport
+  apt:
+    update_cache: yes
+    name: apt-transport-https
+
+- name: Install Docker repo
+  copy:
+    content: "deb https://download.docker.com/linux/debian stretch stable"
+    dest: /etc/apt/sources.list.d/docker.list
+- apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+
+- name: Mask Docker
+  systemd:
+    name: docker
+    masked: true
+
+- name: Update all packages to the latest version
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: Install packages
+  with_items:
+   - bridge-utils
+   - ethtool
+   - htop
+   - vim
+   - curl
+   - "docker-ce={{ DOCKER_VERSION }}~ce-0~debian"
+   - bindfs # bindfs is for fixing NFS mount permissions
+  apt:
+    name: "{{ item }}"
+    install_recommends: no
+
+- name: dd vagrant user to docker group, so that vagrant can user docker without sudo
+  user:
+    name: vagrant
+    append: true
+    groups: docker
+
+- name: Create dirs for nfs mapping
+  with_items:
+    - /www-data
+    - /nfs-data
+  file:
+    state: directory
+    path: "{{ item }}"
+
+- name: Enable bash completion
+  blockinfile:
+    block: "{{ lookup('file', 'bash.bashrc') }}"
+    path: /etc/bash.bashrc
+
+- name: Add dir for auth sock from vagrant
+  file:
+    path: /sock/
+    state: directory
+    owner: vagrant

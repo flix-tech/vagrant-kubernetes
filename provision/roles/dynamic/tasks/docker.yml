@@ -1,0 +1,28 @@
+- name: Disable all docker networking stuff, we will set it up manually
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+
+- name: Setup the bridge for docker, we connect it with the VirtualBox network (eth1)
+  template:
+    src: cbr0.j2
+    dest: /etc/network/interfaces.d/cbr0
+
+- name: Fix various settings on start
+  copy:
+    src: vagrant-startup.service
+    dest: /etc/systemd/system/vagrant-startup.service
+- template:
+    src: vagrant-startup.sh.j2
+    dest: /usr/bin/vagrant-startup
+    mode: +x
+- service:
+    name: vagrant-startup
+    state: started
+    enabled: yes
+
+- name: Unmask Docker
+  systemd:
+    name: docker
+    masked: false
+    state: started

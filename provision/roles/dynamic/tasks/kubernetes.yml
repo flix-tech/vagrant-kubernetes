@@ -1,0 +1,47 @@
+- name: Template Kubernetes Services
+  with_items:
+    - kubelet
+    - kube-apiserver
+  template:
+    src: "{{ item }}.service.j2"
+    dest: "/etc/systemd/system/{{ item }}.service"
+
+- name: Enable Kubernetes services
+  with_items:
+    - kube-apiserver
+    - kubelet
+  ignore_errors: yes
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+
+- file:
+    path: /etc/kubernetes/manifests/
+    state: directory
+- name: Kubernetes manifests
+  with_items:
+    - kube-dns
+    - kube-master
+    - kube-dashboard
+  template:
+    src: "{{ item }}.yml.j2"
+    dest: "/etc/kubernetes/manifests/{{ item }}.yml"
+
+- name: Wait for Kubernetes API to come up
+  uri:
+   url: "http://127.0.0.1:8080/healthz"
+   status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 1
+
+- name: Apply manifests
+  with_items:
+   - kube-dns
+   - kube-master
+   - kube-dashboard
+  command: "kubectl apply -f /etc/kubernetes/manifests/{{ item }}.yml"
+- name: Run mdns
+  command: "kubectl --namespace kube-system run --image flixtech/k8s-mdns:0.2 k8s-mdns"
