@@ -8,7 +8,6 @@ After=docker.service
 ExecStart=/usr/bin/hyperkube kubelet \
 --logtostderr=true \
 --kubeconfig=/etc/kubeconfig.yml \
---require-kubeconfig \
 --hostname-override=${BRIDGE_IP} \
 --address=0.0.0.0 \
 --serialize-image-pulls=false \
@@ -16,6 +15,7 @@ ExecStart=/usr/bin/hyperkube kubelet \
 --cluster-domain=${DNS_DOMAIN} \
 --fail-swap-on=false
 Restart=always
+Type=notify
 RestartSec=10
 
 [Install]
