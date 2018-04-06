@@ -25,7 +25,7 @@
     - kube-master
     - kube-dashboard
   template:
-    src: "{{ item }}.yml.j2"
+    src: "{{ item }}.yml"
     dest: "/etc/kubernetes/manifests/{{ item }}.yml"
 
 - name: Wait for Kubernetes API to come up

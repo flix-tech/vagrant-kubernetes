@@ -1,2 +1,15 @@
+- name: Already provisioned?
+  set_fact:
+    should_run: '{{ item != "/etc/provision/provisioned" }}'
+  with_first_found:
+  - files:
+    - "/etc/provision/provisioned"
+    - "/dev/zero"
 - include: docker.yml
+  when: should_run
 - include: kubernetes.yml
+  when: should_run
+- name: Mark provisioning done
+  copy:
+    content: ''
+    dest: /etc/provision/provisioned
