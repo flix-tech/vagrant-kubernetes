@@ -4,8 +4,8 @@
     url: "https://github.com/coreos/etcd/releases/download/v{{ ETCD_VERSION }}/etcd-v{{ ETCD_VERSION }}-linux-amd64.tar.gz"
 - name: unarchive
   command: "tar xzf /vagrant/etcd-v{{ ETCD_VERSION }}-linux-amd64.tar.gz --strip-components=1 etcd-v{{ ETCD_VERSION }}-linux-amd64/etcd etcd-v{{ ETCD_VERSION }}-linux-amd64/etcdctl"
-  warn: False
   args:
+    warn: False
     chdir: /usr/bin
 - name: Fix permissions
   with_items:
@@ -13,7 +13,7 @@
    - etcdctl
   file:
     path: "/usr/bin/{{ item }}"
-    mode: +x
+    mode: a+x
 
 - name: "Download kubernetes {{ KUBERNETES_VERSION }}"
   get_url:
@@ -21,8 +21,8 @@
     url: "https://storage.googleapis.com/kubernetes-release/release/v{{ KUBERNETES_VERSION }}/kubernetes-server-linux-amd64.tar.gz"
 - name: unarchive
   command: "tar xzf /vagrant/kubernetes-server-v{{ KUBERNETES_VERSION }}.tar.gz --strip-components=3 kubernetes/server/bin/kubectl kubernetes/server/bin/hyperkube"
-  warn: False
   args:
+    warn: False
     chdir: /usr/bin
 - name: Fix permissions
   with_items:
@@ -30,14 +30,30 @@
    - kubectl
   file:
     path: "/usr/bin/{{ item }}"
-    mode: +x
+    mode: a+x
+
 - name: Kubectl bash completion
   shell: "kubectl completion bash > /etc/bash_completion.d/kubectl"
-- copy:
+- name: Kubectl config file
+  copy:
     src: kubeconfig.yml
     dest: /etc/kubeconfig.yml
 
-- name:
+- name: Install upx
+  when: False
+  apt:
+    name: upx
+    install_recommends: no
+- name: Compress Kubernets binaries
+  when: False
+  with_items:
+    - hyperkube
+    - kubectl
+    - etcd
+    - etcdctl
+  command: upx -q /usr/bin/{{ item }}
+
+- name: Kuberntes Service Files
   with_items:
     - kube-controller-manager
     - kube-scheduler

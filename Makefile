@@ -28,9 +28,7 @@ del-box:
 	VBoxManage storageattach $(MACHINEID) --storagectl "SATA Controller" --port 0 --type hdd --medium $(HDDFILE)
 	VBoxManage closemedium disk cloned.vdi --delete
 	SCRIPT=provision/02-playbook-repartition.yml vagrant reload --provision
-	vagrant halt
-	SCRIPT=provision/03-playbook-reformat.yml vagrant reload --provision
-	vagrant halt
+	SCRIPT=provision/03-playbook-reformat.yml vagrant reload --provision || true
 	touch .vagrant/repartinioned
 
 package.box: .vagrant/repartinioned Vagrantfile.dist
@@ -44,7 +42,7 @@ tmp/Vagrantfile: package.box
 	rm -f tmp/Vagrantfile.back
 	rm -f tmp/vagrant_private_key
 
-stripped.box: tmp/Vagrantfile
+stripped.box: tmp/Vagrantfile tmp/include/_Vagrantfile
 	tar -czf stripped.box -C tmp/ .
 
 box.meta: stripped.box box-metadata.sh
@@ -52,6 +50,7 @@ box.meta: stripped.box box-metadata.sh
 
 .PHONY: test
 test: add-box
+	cd test; vagrant destroy -f
 	test/test.sh
 
 .PHONY: clean dist-clean
