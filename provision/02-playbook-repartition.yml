@@ -1,8 +1,6 @@
 -
   hosts: all
   any_errors_fatal: true
-  pre_tasks:
-    - include_vars: vars.yml
   tasks:
   - shell: apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
     args:

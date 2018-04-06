@@ -1,14 +1,12 @@
 -
   hosts: all
   any_errors_fatal: true
-  pre_tasks:
-    - include_vars: vars.yml
   tasks:
   - command: mkswap /dev/sda2
   - shell: blkid /dev/sda2 -s UUID | cut -f 2 -d '=' | tr -d '"'
     register: SWAPUUID
   - lineinfile:
-      line: "UUID={{ SWAPUUID }} none            swap    sw              0       0"
+      line: "UUID={{ SWAPUUID.stdout }} none            swap    sw              0       0"
       dest: /etc/fstab
   - file:
       state: absent

@@ -1,0 +1,12 @@
+DOCKER_CIDR: "{{ NET_CIDR|ipsubnet(NET_CIDR|ipaddr('prefix')|int + 1, 1) }}"
+BRIDGE_IP: "{{ NET_CIDR|ipaddr('+2')|ipaddr('address') }}"
+BRIDGE_MASK: "{{ NET_CIDR|ipaddr('netmask') }}"
+
+KUBERNETES_INSECURE_IP: "{{ PORTAL_CIDR|ipaddr('+2')|ipaddr('address') }}"
+DASHBOARD_IP: "{{ PORTAL_CIDR|ipaddr('+3')|ipaddr('address') }}"
+CLUSTERDNS_IP: "{{ PORTAL_CIDR|ipaddr('+4')|ipaddr('address') }}"
+
+# To be overridden
+DNS_DOMAIN: k8s.local
+NET_CIDR: 10.10.0.0/24
+PORTAL_CIDR: 10.0.0.0/24

@@ -62,6 +62,11 @@
     name: "{{ item }}"
     install_recommends: no
 
+- name: Docker config dir
+  file:
+    path: /etc/docker
+    state: directory
+
 - name: dd vagrant user to docker group, so that vagrant can user docker without sudo
   user:
     name: vagrant

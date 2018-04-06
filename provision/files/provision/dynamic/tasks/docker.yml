@@ -8,6 +8,9 @@
     src: cbr0.j2
     dest: /etc/network/interfaces.d/cbr0
 
+- name: Bringe up bridge
+  command: ifup cbr0
+
 - name: Fix various settings on start
   copy:
     src: vagrant-startup.service
@@ -15,7 +18,7 @@
 - template:
     src: vagrant-startup.sh.j2
     dest: /usr/bin/vagrant-startup
-    mode: +x
+    mode: a+x
 - service:
     name: vagrant-startup
     state: started

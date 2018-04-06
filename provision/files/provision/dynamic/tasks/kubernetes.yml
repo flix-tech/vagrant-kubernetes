@@ -35,7 +35,7 @@
   register: result
   until: result.status == 200
   retries: 10
-  delay: 1
+  delay: 2
 
 - name: Apply manifests
   with_items:

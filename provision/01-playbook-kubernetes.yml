@@ -2,6 +2,10 @@
   hosts: all
   any_errors_fatal: true
   pre_tasks:
-    - include_vars: vars.yml
+    - include_vars: versions.yml
   roles:
     - static
+  tasks:
+    - copy:
+        src: provision
+        dest: /etc/
