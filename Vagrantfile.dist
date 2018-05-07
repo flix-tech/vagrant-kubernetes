@@ -29,6 +29,12 @@ Vagrant.configure(2) do |config|
     PORTAL_CIDR = '10.0.0.0/24'
   end
 
+  if ENV['CLUSTER_DOMAIN']
+      CLUSTER_DOMAIN = ENV['CLUSTER_DOMAIN']
+    else
+      CLUSTER_DOMAIN = 'cluster.local'
+    end
+
   NETMASK = IPAddr.new('255.255.255.255').mask(NET_CIDR.split('/')[1]).to_s
   IP = IPAddr.new(NET_CIDR.split('/')[0]).mask(NETMASK).succ.succ.to_s
 
@@ -46,7 +52,7 @@ Vagrant.configure(2) do |config|
       ansible.playbook = "/etc/provision/playbook.yml"
       ansible.become = true
       ansible.compatibility_mode = "2.0"
-      ansible.raw_arguments = '--extra-vars "NET_CIDR=' + NET_CIDR + ' PORTAL_CIDR=' + PORTAL_CIDR + '"'
+      ansible.raw_arguments = '--extra-vars "NET_CIDR=' + NET_CIDR + ' PORTAL_CIDR=' + PORTAL_CIDR + ' CLUSTER_DOMAIN=' + CLUSTER_DOMAIN + '"'
     end
 
    config.vm.provider :virtualbox do |vb|

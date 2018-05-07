@@ -7,6 +7,6 @@ DASHBOARD_IP: "{{ PORTAL_CIDR|ipaddr('+3')|ipaddr('address') }}"
 CLUSTERDNS_IP: "{{ PORTAL_CIDR|ipaddr('+4')|ipaddr('address') }}"
 
 # To be overridden
-DNS_DOMAIN: k8s.local
+CLUSTER_DOMAIN: cluster.local
 NET_CIDR: 10.10.0.0/24
 PORTAL_CIDR: 10.0.0.0/24
