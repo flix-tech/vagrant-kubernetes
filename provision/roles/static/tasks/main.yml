@@ -43,10 +43,10 @@
     name: docker
     masked: true
 
-- name: Update all packages to the latest version
-  apt:
-    update_cache: yes
-    upgrade: dist
+#- name: Update all packages to the latest version
+#  apt:
+#    update_cache: yes
+#    upgrade: dist
 
 - name: Install packages
   with_items:
@@ -60,6 +60,7 @@
    - bindfs # bindfs is for fixing NFS mount permissions
   apt:
     name: "{{ item }}"
+    update_cache: yes
     install_recommends: no
 
 - name: Docker config dir
@@ -80,6 +81,11 @@
   file:
     state: directory
     path: "{{ item }}"
+
+- name: Create nfs mapping
+  lineinfile:
+    path: /etc/fstab
+    line: 'bindfs#/nfs-data    /www-data    fuse    force-user=www-data,force-group=www-data    0    0'
 
 - name: Enable bash completion
   blockinfile:
