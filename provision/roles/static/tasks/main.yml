@@ -56,7 +56,7 @@
    - vim
    - curl
    - ansible
-   - "docker-ce={{ DOCKER_VERSION }}~ce-0~debian"
+   - "docker-ce={{ DOCKER_VERSION }}"
    - bindfs # bindfs is for fixing NFS mount permissions
   apt:
     name: "{{ item }}"
